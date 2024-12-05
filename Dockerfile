@@ -7,8 +7,14 @@ WORKDIR /app
 # Proje dosyalarını Docker imajına kopyalıyoruz
 COPY . /app
 
-# Maven'i kuruyoruz
-RUN apt-get update && apt-get install -y maven
+# JavaFX ve diğer bağımlılıkları yükleyelim
+RUN apt-get update && apt-get install -y \
+    libopenjfx-java \
+    libgl1-mesa-glx \
+    libxext6 \
+    libxrender1 \
+    libxrandr2 \
+    maven
 
 # Maven komutuyla projeyi derliyoruz
 RUN mvn clean install
