@@ -4,20 +4,21 @@ FROM openjdk:17-jdk-slim
 # Çalışma dizinini ayarlıyoruz
 WORKDIR /app
 
-# Proje dosyalarını Docker imajına kopyalıyoruz
-COPY . /app
-
-# JavaFX ve diğer bağımlılıkları yükleyelim
+# Gerekli bağımlılıkları yükleyelim (JavaFX, grafik kütüphaneleri ve Maven)
 RUN apt-get update && apt-get install -y \
     libopenjfx-java \
     libgl1-mesa-glx \
     libxext6 \
     libxrender1 \
     libxrandr2 \
-    maven
+    maven && \
+    apt-get clean
+
+# Proje dosyalarını Docker imajına kopyalıyoruz
+COPY . /app
 
 # Maven komutuyla projeyi derliyoruz
 RUN mvn clean install
 
-# Uygulamanın çalışması için komutu belirliyoruz
-CMD ["java", "-jar", "target/sample-java-app-1.0-SNAPSHOT.jar"]
+# JavaFX runtime ile uygulamayı başlatacak komutu belirliyoruz
+CMD ["java", "--module-path", "/usr/share/openjfx/lib", "--add-modules", "javafx.controls,javafx.web", "-jar", "target/sample-java-app-1.0-SNAPSHOT.jar"]
